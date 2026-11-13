@@ -898,8 +898,11 @@ class ParticleClass:
         self.r += self.v * dt  
 
     def collide_detection(self, other):
-        ### YOUR CODE HERE ###
-        return  dx**2+dy**2 < rr**2 
+        dx = self.r[0] - other.r[0]
+        dy = self.r[1] - other.r[1]
+        rr = self.R + other.R
+
+        return dx**2 + dy**2 < rr**2
 ```
 
 ```python
@@ -950,7 +953,7 @@ def update(frame):
 
     # botsing tussen de deeltjes onderling
     if particleA.collide_detection(particleB):
-        ### YOUR CODE HERE ###
+        particleA.v, particleB.v = particleB.v.copy(), particleA.v.copy()
 
 
     # botsing met de wand
@@ -1055,7 +1058,7 @@ class ParticleClass:
 dt = 0.1         # time step
 num_steps = 530  # number of time steps
 m1 = 1.0
-m2 = 1.0
+m2 = 50
 
 particleA = ParticleClass(m=m1, v=[0, 0], r=[-4.0, 0.0],R=0.45)  
 particleB = ParticleClass(m=m2, v=[-1, 0], r=[-2.0, 0.0],R=0.45)  
@@ -1104,21 +1107,21 @@ def update(frame):
         vB_new = vB - 2 * mA / (mA + mB) * np.dot(vB - vA, rB - rA) / (1e-12+np.linalg.norm(rB - rA))**2 * (rB - rA)
         particleA.v = vA_new
         particleB.v = vB_new
-        ### YOUR CODE HERE ###
+        counter += 1
 
 
     # wall collision detection and response
     if particleA.r[0]**2>100: # Check if particle is outside the bounds, np.abs could be used but is slower
         particleA.v[0] = -particleA.v[0]
-        ### YOUR CODE HERE ###
+        counter += 1
     if particleA.r[1]**2>100: 
         particleA.v[1] = -particleA.v[1]
-        ### YOUR CODE HERE ###
+        counter += 1
 
     dot.set_data([particleB.r[0]], [particleB.r[1]])
     if particleB.r[0]**2>100: 
         particleB.v[0] = -particleB.v[0]
-
+        
     if particleB.r[1]**2>100: 
         particleB.v[1] = -particleB.v[1]
 
@@ -1139,7 +1142,7 @@ Pas de bovenstaande code aan zodat $m_1 = 1$ en $m_2 = 50$. Run de code en geef 
 
 ```python tags=["NB1_eindantwoord"]
 #num_botsingen = ...
-### YOUR CODE HERE ###
+print(counter)
 ```
 
 ```{exercise}
