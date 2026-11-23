@@ -29,7 +29,7 @@ Voor het maken van een simulatie van gasmoleculen in een gesloten volume zal je 
 Alhoewel het interessant is om steeds een animatie te maken van de beweging van de deeltjes, vraagt dit veel rekentijd. Je kan ook regelmatig een plot maken om te controleren of het programma werkt zoals je verwacht.
 ```
 
-
+<!-- #region -->
 ### De initiële condities
 
 In onze simulatie gaan we uit van een aantal aannames. Bij deze aannames wil je dat de simulatie een voorspellende waarde heeft voor een reëel systeem, maar ook dat de benodigde rekenkracht voor het uitvoeren van de simulatie op te brengen is. We kiezen daarom voor de volgende condities:
@@ -48,8 +48,11 @@ Als model gaan we uit van een deel van het volume van een fietsband die onder ee
 ```
 
 ```{solution} ex-recap-1
-### YOUR CODE HERE ###
-```
+ $ pv = Nk_BT$ en $ V_{molecuul} = \frac{V}{N}$, dus $V= \frac{k_BT}{p}$ met $p = 10\cdot10^5$, $ T= 293$ en $ k_B = 1.38\cdot10^{-23}$ geeft
+ dat de rib is dan gelijk aan $l = 1,6$
+``` 
+
+
 
 De simulatie die we gaan maken bevat maar twee dimensies. We kunnen het oppervlak per deeltje in deze simulatie daarom kiezen als het zojuist berekende $V_\text{molecuul}^{2/3}$.
 
@@ -86,6 +89,7 @@ Bekijk de waarde van `DT`. Hoe zorgt deze waaarde ervoor dat het onwaarschijnlij
 ```
 
 Onze simulatie modelleert dus een klein systeem zonder rekening te houden met de kracht tussen de luchtmoleculen. Je zult zien dat we toch al behoorlijk wat van de processor vragen om deze berekeningen te doen. Om een meer realistische modelsimulatie te maken is daarom een serieuze uitdaging, die veel wiskunde en programmeerervaring vraagt. Op dit ogenblik wordt dit bijvoorbeeld gevraagd bij een van de eerste opdrachten van het vak 'Computational Physics' van de master Applied Physics. 
+<!-- #endregion -->
 
 ```python tags=["NB2_init"] editable=true slideshow={"slide_type": ""}
 BOX_SIZE_0 = 10                # Hoogte en lengte startvolume
