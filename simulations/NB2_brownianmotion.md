@@ -1038,8 +1038,71 @@ We kunnen twee "groepen" van deeltjes aanmaken, elk  met een andere massa. Als w
 ```
 
 ```python
-### YOUR CODE HERE ###
 
+Box_width = 10
+Box_height = 20   # 2x zo hoog als breed
+
+N = 80            # dubbel aantal deeltjes
+v_0 = 1
+g = 0.05          # artificieel grote zwaartekracht
+
+particles = []
+
+# Lichte deeltjes (blauw)
+for i in range(N//2):
+
+    vx = np.random.uniform(-v_0, v_0)
+    vy = np.random.choice([-1, 1]) * np.sqrt(v_0**2 - vx**2)
+
+    pos = [np.random.uniform(-Box_width/2 + 0.5, Box_width/2 - 0.5), np.random.uniform(-Box_height/2 + 0.5, Box_height/2 - 0.5)]
+
+    particles.append(ParticleClass(m=1,v=[vx, vy], r=pos, R=0.5, c='blue'))
+
+# Zware deeltjes (rood)
+for i in range(N//2):
+
+    vx = np.random.uniform(-v_0, v_0)
+    vy = np.random.choice([-1, 1]) * np.sqrt(v_0**2 - vx**2)
+
+    pos = [np.random.uniform(-Box_width/2 + 0.5, Box_width/2 - 0.5), np.random.uniform(-Box_height/2 + 0.5, Box_height/2 - 0.5)]
+
+    particles.append(ParticleClass( m=5, v=[vx, vy], r=pos, R=0.5, c='red'))
+
+# Simulatie
+for step in range(5000):
+
+    for p in particles:
+
+        # zwaartekracht
+        p.v[1] -= g * dt
+
+        p.update_position()
+
+        # horizontale wand
+        if abs(p.r[0]) + p.R > Box_width/2:
+            p.v[0] *= -1
+
+        # verticale wand
+        if abs(p.r[1]) + p.R > Box_height/2:
+            p.v[1] *= -1
+
+    handle_collisions(particles)
+
+# Plot eindtoestand
+plt.figure(figsize=(6,10))
+
+for p in particles:
+    plt.plot(p.r[0], p.r[1], '.', color=p.c, markersize=10)
+
+plt.xlim(-Box_width/2, Box_width/2)
+plt.ylim(-Box_height/2, Box_height/2)
+
+plt.xlabel("x")
+plt.ylabel("y")
+plt.title("Blauw: lichte deeltjes | Rood: zware deeltjes")
+
+plt.grid()
+plt.show()
 ```
 
 ```python
