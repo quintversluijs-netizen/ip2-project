@@ -223,7 +223,14 @@ Schrijf een functie die de temperatuur van het gas in onze simulatie bepaalt:
 ```python tags=["NB3_tempfun"]
 def temperature(particles) -> float:
     temp = 0.0 
-    ### YOUR CODE HERE ###
+    k = 1.380649e-23
+    f = 2
+
+    v2_avg = np.mean([np.dot(p.v, p.v) for p in particles])
+    m = particles[0].m
+
+    temp = (m * v2_avg) / (k * f)
+    return temp
     return temp
 ```
 
@@ -245,14 +252,16 @@ times = np.linspace(1, 100, 100)
 create_particles(particles)
 for i in range(100):
     take_time_step(particles)
+    
     # vastleggen van temperatuur per tijdstap
-    ### YOUR CODE HERE ###
+    temperatures[i] = temperature(particles)
+
 
 plt.figure()
-plt.xlabel('Time')
-plt.ylabel('Temperature')
+plt.xlabel('$Time$ (tijd eenheid)')
+plt.ylabel('$Temperature$ (kelvin)')
 # plotten van tijd tegen temperatuur
-### YOUR CODE HERE ###
+plt.plot(times, temperatures)
 plt.show()
 ```
 
@@ -347,16 +356,23 @@ particles = []
 pressures = np.zeros(100, dtype=float)
 times = np.linspace(1, 100, 100)
 
-### YOUR CODE HERE ###
+create_particles(particles)
+for i in range(100):
+    take_time_step(particles)
+    
+    pressures[i] = pressure
 
 plt.figure()
 plt.xlabel('Time [step]')
 plt.ylabel('Pressure [a.u.]')
-
 plt.plot(times, pressures, '-r')
-
+plt.title("Druk als functie van de tijd")
+plt.grid()
 plt.show()
 
+# De grafiek is niet vlak omdat de druk wordt bepaald uit de impulsverandering van de deeltjes
+# die tijdens één tijdstap tegen de wand botsen. Het aantal botsingen verschilt per tijdstap, waardoor
+# de gemeten druk niet gelijk blijft. 
 ```
 
 <!-- #region tags=[] -->
@@ -377,7 +393,8 @@ Zet je initiële waarden weer terug.
 
 ```python tags=[]
 ### YOUR CODE HERE ###
-
+N = 400
+BOX_SIZE_0 = 30
 ```
 
 Een goedkoper alternatief bestaat uit het middelen van de druk over de tijd.
@@ -425,7 +442,18 @@ times = np.linspace(1, N_steps, N_steps)
 
 create_particles(particles)
 
-### YOUR CODE HERE ###
+for i in range(N_steps):
+    take_time_step(particles)
+    
+    pressures[i] = pressure
+
+plt.figure()
+plt.xlabel('Time [step]')
+plt.ylabel('Pressure [a.u.]')
+plt.plot(times, pressures, '-r')
+plt.title("Druk als functie van de tijd")
+plt.grid()
+plt.show()
 
 ```
 
@@ -437,7 +465,7 @@ We kunnen de gevonden druk nu wel uitdrukken in SI-eenheden met behulp van de vo
 ```
 
 ```{solution} ex-druktemp-7
-### YOUR CODE HERE ###
+Omdat de simulatie een vereenvoudigd tweedimensionaal model is met een klein aantal deeeltjes. Ook zijn de gekozen schaalfactoren, het volume en de beginvoorwaarden niet exact gelijk aan die van een echte fietsband. 
 ```
 
 
@@ -449,7 +477,7 @@ Leg op basis van de vormen die je ziet en de bijbehorende wiskunde uit dat dit e
 ```
 
 ```{solution} ex-druktemp-8
-### YOUR CODE HERE ###
+De methode heet een exponentieel voortschrijdend gemiddelde omdat de huidige waarde wordt berekend uit een gemiddelde van de huidige en voorgaande meetwaarden. Oudere meetwaarden tellen steeds minder mee volgens de factoren (1−α)^n, die exponentieel afnemen.
 ```
 
 
@@ -480,6 +508,10 @@ Controleer of je uitkomst overeenkomt met de theorie en verifieer hiermee de cod
 
 ```python
 ### YOUR CODE HERE ###
+P_theorie = particles[0].m * N * np.mean([np.dot(p.v, p.v) for p in particles]) / (2 * BOX_SIZE_0**2)
+
+print("Theorie:", P_theorie)
+print("Simulatie:", np.mean(pressures))
 ```
 
 In [de formule voor de tweedimensionale druk](2d_pressure) kan je de structuur van de ideale gaswet herkennen. 
@@ -493,7 +525,10 @@ Herleid dezelfde formule af voor het driedimensionale geval. Laat zien welke rel
 
 ```{solution} ex-druktemp9b
 Geef hier de relatie tussen de constanten...
-### YOUR CODE HERE ###
+R = N_a * k
+R = gasconstante
+N_a = constante van Avogadro
+k = constante van Boltzmann
 ```
 
 
@@ -523,9 +558,85 @@ Je ziet dat de druk een statistisch bepaalde grootheid is die met de tijd variee
 ```
 
 ```python
+particles = []
+create_particles(particles)
+
+N_steps = 10000
+pressures = np.zeros(N_steps)
+
+for i in range(N_steps):
+    take_time_step(particles)
+    pressures[i] = pressure
+
+# Histogram
+plt.figure()
+plt.hist(pressures, bins=50)
+plt.xlabel("Pressure [a.u.]")
+plt.ylabel("Count")
+plt.title("Histogram van de druk (N = 40)")
+plt.grid()
+plt.show()
+
+# Statistiek
+gemiddelde = np.mean(pressures)
+std = np.std(pressures)
+rel = std / gemiddelde
+
+print("Gemiddelde druk =", gemiddelde)
+print("Standaardafwijking =", std)
+print("Relatieve fluctuatie =", rel)
+
+N_old = N
+BOX_old = BOX_SIZE_0
+
+# zelfde dichtheid behouden
+N = 80
+BOX_SIZE_0 = BOX_old * np.sqrt(2)
+
+particles = []
+create_particles(particles)
+
+pressures_80 = np.zeros(N_steps)
+
+for i in range(N_steps):
+    take_time_step(particles)
+    pressures_80[i] = pressure
+
+# Histogram
+plt.figure()
+plt.hist(pressures_80, bins=50)
+plt.xlabel("Pressure [a.u.]")
+plt.ylabel("Count")
+plt.title("Histogram van de druk (N = 80)")
+plt.grid()
+plt.show()
+
+# Statistiek
+mean_80 = np.mean(pressures_80)
+std_80 = np.std(pressures_80)
+rel_80 = std_80 / mean_80
+
+print("\nN = 80")
+print("Gemiddelde druk =", mean_80)
+print("Standaardafwijking =", std_80)
+print("Relatieve fluctuatie =", rel_80)
 
 
+print("\nVergelijking")
+print("Relatieve fluctuatie N=40 :", rel)
+print("Relatieve fluctuatie N=80 :", rel_80)
+print("Verhouding:", rel_80 / rel)
 
+# Extrapolatie naar N = 10^23
+
+rel_real = rel * np.sqrt(40 / 1e23)
+
+print("\nGeschatte relatieve fluctuatie voor N = 10^23:")
+print(rel_real)
+
+# oorspronkelijke waarden terugzetten
+N = N_old
+BOX_SIZE_0 = BOX_old
 ```
 
 ```python
